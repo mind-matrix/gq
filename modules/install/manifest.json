@@ -1,0 +1,8 @@
+{
+    "description": "Module Installer for GQ",
+    "command": "install",
+    "alias": "i",
+    "files": [
+        "index.js"
+    ]
+}
