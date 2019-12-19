@@ -19,6 +19,7 @@
     "gq": "./index.js"
   },
   "dependencies": {
+    "chai": "^4.2.0",
     "commander": "^4.0.1",
     "graphql": "^14.5.8",
     "js-beautify": "^1.10.2",
