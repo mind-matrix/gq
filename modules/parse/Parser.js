@@ -15,21 +15,25 @@ class Parser {
     parseAll(modelsDirectory, outputDirectory) {
         var files = fs.readdirSync(modelsDirectory);
         var types = [], queries = {}, mutations = {}, errors = [];
-        files.forEach((file, i) => {
-            var fileinfo = path.parse(file);
-            if(fileinfo.ext === '.json') {
-                var { mongooseCode, gqlCode, gqlQuery, gqlMutation } = this.parse(path.join(modelsDirectory, file), fileinfo.name);
-                if(!fs.existsSync(path.join(outputDirectory, 'models')))
-                    fs.mkdirSync(path.join(outputDirectory, 'models'));
-                if(!fs.existsSync(path.join(outputDirectory, 'schema')))
-                    fs.mkdirSync(path.join(outputDirectory, 'schema'));
-                fs.writeFileSync(path.join(outputDirectory, 'models', fileinfo.name + '.js'), mongooseCode);
-                fs.writeFileSync(path.join(outputDirectory, 'schema', fileinfo.name + '.js'), gqlCode);
-                types.push(fileinfo.name);
-                queries[fileinfo.name] = gqlQuery;
-                mutations[fileinfo.name] = gqlMutation;
-            }
-        }).catch((error) => errors.push(error));
+        try {
+            files.forEach((file, i) => {
+                var fileinfo = path.parse(file);
+                if(fileinfo.ext === '.json') {
+                    var { mongooseCode, gqlCode, gqlQuery, gqlMutation } = this.parse(path.join(modelsDirectory, file), fileinfo.name);
+                    if(!fs.existsSync(path.join(outputDirectory, 'models')))
+                        fs.mkdirSync(path.join(outputDirectory, 'models'));
+                    if(!fs.existsSync(path.join(outputDirectory, 'schema')))
+                        fs.mkdirSync(path.join(outputDirectory, 'schema'));
+                    fs.writeFileSync(path.join(outputDirectory, 'models', fileinfo.name + '.js'), mongooseCode);
+                    fs.writeFileSync(path.join(outputDirectory, 'schema', fileinfo.name + '.js'), gqlCode);
+                    types.push(fileinfo.name);
+                    queries[fileinfo.name] = gqlQuery;
+                    mutations[fileinfo.name] = gqlMutation;
+                }
+            });
+        } catch (error) {
+            errors.push(error);
+        }
         fs.writeFileSync(path.join(outputDirectory, 'models', 'index.js'), Parser.GetModelCompiler(types));
         fs.writeFileSync(path.join(outputDirectory, 'schema', 'index.js'), Parser.GetGQLCompiler(types, queries, mutations));
         return errors;
